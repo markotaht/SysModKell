@@ -1,8 +1,9 @@
 package org.yakindu.scr.digitalwatch;
 
 import org.yakindu.scr.IStatemachine;
+import org.yakindu.scr.ITimerCallback;
 
-public interface IDigitalwatchStatemachine extends IStatemachine {
+public interface IDigitalwatchStatemachine extends ITimerCallback,IStatemachine {
 
 	public interface SCIButtons {
 	
@@ -99,5 +100,13 @@ public interface IDigitalwatchStatemachine extends IStatemachine {
 	}
 	
 	public SCILogicUnit getSCILogicUnit();
+	
+	public interface SCIInternal {
+	
+		public void raiseUpdate();
+		
+	}
+	
+	public SCIInternal getSCIInternal();
 	
 }
