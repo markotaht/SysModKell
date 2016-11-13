@@ -108,8 +108,15 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			update = true;
 		}
 		
+		private boolean chronoUpdate;
+		
+		public void raiseChronoUpdate() {
+			chronoUpdate = true;
+		}
+		
 		protected void clearEvents() {
 			update = false;
+			chronoUpdate = false;
 		}
 	}
 	
@@ -119,12 +126,15 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	public enum State {
 		main_region_digitalwatch,
+		main_region_digitalwatch_ChronoTicker_Tick,
+		main_region_digitalwatch_ChronoTicker_Stopped,
 		main_region_digitalwatch_Ticker_Main,
 		main_region_digitalwatch_Ticker_Main_Main_Placeholder,
 		main_region_digitalwatch_Ticker_Main_Main_Temp,
 		main_region_digitalwatch_Ticker_Main_Ticker_Tick,
 		main_region_digitalwatch_Ticker_Main_Update_TimeDisplay,
 		main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay,
+		main_region_digitalwatch_Ticker_Main_Update_Resetting,
 		main_region_digitalwatch_Ticker_Editing,
 		main_region_digitalwatch_Ticker_Editing_Editing_HEhe,
 		main_region_digitalwatch_Light_LightOff,
@@ -133,13 +143,13 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		$NullState$
 	};
 	
-	private final State[] stateVector = new State[4];
+	private final State[] stateVector = new State[5];
 	
 	private int nextStateIndex;
 	
 	private ITimer timer;
 	
-	private final boolean[] timeEvents = new boolean[4];
+	private final boolean[] timeEvents = new boolean[6];
 	public DigitalwatchStatemachine() {
 		sCIButtons = new SCIButtonsImpl();
 		sCIDisplay = new SCIDisplayImpl();
@@ -152,7 +162,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		if (timer == null) {
 			throw new IllegalStateException("timer not set.");
 		}
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			stateVector[i] = State.$NullState$;
 		}
 		clearEvents();
@@ -178,7 +188,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	 * @see IStatemachine#isActive()
 	 */
 	public boolean isActive() {
-		return stateVector[0] != State.$NullState$||stateVector[1] != State.$NullState$||stateVector[2] != State.$NullState$||stateVector[3] != State.$NullState$;
+		return stateVector[0] != State.$NullState$||stateVector[1] != State.$NullState$||stateVector[2] != State.$NullState$||stateVector[3] != State.$NullState$||stateVector[4] != State.$NullState$;
 	}
 	
 	/** 
@@ -216,30 +226,36 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		case main_region_digitalwatch:
 			return stateVector[0].ordinal() >= State.
 					main_region_digitalwatch.ordinal()&& stateVector[0].ordinal() <= State.main_region_digitalwatch_Light_Wait.ordinal();
+		case main_region_digitalwatch_ChronoTicker_Tick:
+			return stateVector[0] == State.main_region_digitalwatch_ChronoTicker_Tick;
+		case main_region_digitalwatch_ChronoTicker_Stopped:
+			return stateVector[0] == State.main_region_digitalwatch_ChronoTicker_Stopped;
 		case main_region_digitalwatch_Ticker_Main:
-			return stateVector[0].ordinal() >= State.
-					main_region_digitalwatch_Ticker_Main.ordinal()&& stateVector[0].ordinal() <= State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay.ordinal();
+			return stateVector[1].ordinal() >= State.
+					main_region_digitalwatch_Ticker_Main.ordinal()&& stateVector[1].ordinal() <= State.main_region_digitalwatch_Ticker_Main_Update_Resetting.ordinal();
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
-			return stateVector[0] == State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
 		case main_region_digitalwatch_Ticker_Main_Main_Temp:
-			return stateVector[0] == State.main_region_digitalwatch_Ticker_Main_Main_Temp;
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Main_Temp;
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
-			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Ticker_Tick;
+			return stateVector[2] == State.main_region_digitalwatch_Ticker_Main_Ticker_Tick;
 		case main_region_digitalwatch_Ticker_Main_Update_TimeDisplay:
-			return stateVector[2] == State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay;
+			return stateVector[3] == State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay;
 		case main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay:
-			return stateVector[2] == State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay;
+			return stateVector[3] == State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay;
+		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
+			return stateVector[3] == State.main_region_digitalwatch_Ticker_Main_Update_Resetting;
 		case main_region_digitalwatch_Ticker_Editing:
-			return stateVector[0].ordinal() >= State.
-					main_region_digitalwatch_Ticker_Editing.ordinal()&& stateVector[0].ordinal() <= State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe.ordinal();
+			return stateVector[1].ordinal() >= State.
+					main_region_digitalwatch_Ticker_Editing.ordinal()&& stateVector[1].ordinal() <= State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe.ordinal();
 		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-			return stateVector[0] == State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
 		case main_region_digitalwatch_Light_LightOff:
-			return stateVector[3] == State.main_region_digitalwatch_Light_LightOff;
+			return stateVector[4] == State.main_region_digitalwatch_Light_LightOff;
 		case main_region_digitalwatch_Light_LightOn:
-			return stateVector[3] == State.main_region_digitalwatch_Light_LightOn;
+			return stateVector[4] == State.main_region_digitalwatch_Light_LightOn;
 		case main_region_digitalwatch_Light_Wait:
-			return stateVector[3] == State.main_region_digitalwatch_Light_Wait;
+			return stateVector[4] == State.main_region_digitalwatch_Light_Wait;
 		default:
 			return false;
 		}
@@ -285,6 +301,18 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		return sCIInternal;
 	}
 	
+	private boolean check_main_region_digitalwatch_ChronoTicker_Tick_tr0_tr0() {
+		return timeEvents[0];
+	}
+	
+	private boolean check_main_region_digitalwatch_ChronoTicker_Tick_tr1_tr1() {
+		return (sCIButtons.bottomRightPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay));
+	}
+	
+	private boolean check_main_region_digitalwatch_ChronoTicker_Stopped_tr0_tr0() {
+		return (sCIButtons.bottomRightPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay));
+	}
+	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Main_Placeholder_tr0_tr0() {
 		return sCIButtons.bottomRightPressed;
 	}
@@ -294,11 +322,11 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Main_Temp_tr1_tr1() {
-		return timeEvents[0];
+		return timeEvents[1];
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Ticker_Tick_tr0_tr0() {
-		return timeEvents[1];
+		return timeEvents[2];
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay_tr0_tr0() {
@@ -310,15 +338,23 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr0_tr0() {
-		return sCIInternal.update;
+		return sCIInternal.chronoUpdate;
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr1_tr1() {
 		return sCIButtons.topLeftPressed;
 	}
 	
+	private boolean check_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr2_tr2() {
+		return sCIButtons.bottomLeftPressed;
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Main_Update_Resetting_tr0_tr0() {
+		return timeEvents[3];
+	}
+	
 	private boolean check_main_region_digitalwatch_Ticker_Editing_tr0_tr0() {
-		return timeEvents[2];
+		return timeEvents[4];
 	}
 	
 	private boolean check_main_region_digitalwatch_Light_LightOff_tr0_tr0() {
@@ -330,7 +366,24 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Light_Wait_tr0_tr0() {
-		return timeEvents[3];
+		return timeEvents[5];
+	}
+	
+	private void effect_main_region_digitalwatch_ChronoTicker_Tick_tr0() {
+		exitSequence_main_region_digitalwatch_ChronoTicker_Tick();
+		sCIInternal.raiseChronoUpdate();
+		
+		enterSequence_main_region_digitalwatch_ChronoTicker_Tick_default();
+	}
+	
+	private void effect_main_region_digitalwatch_ChronoTicker_Tick_tr1() {
+		exitSequence_main_region_digitalwatch_ChronoTicker_Tick();
+		enterSequence_main_region_digitalwatch_ChronoTicker_Stopped_default();
+	}
+	
+	private void effect_main_region_digitalwatch_ChronoTicker_Stopped_tr0() {
+		exitSequence_main_region_digitalwatch_ChronoTicker_Stopped();
+		enterSequence_main_region_digitalwatch_ChronoTicker_Tick_default();
 	}
 	
 	private void effect_main_region_digitalwatch_Ticker_Main_Main_Placeholder_tr0() {
@@ -375,6 +428,18 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		enterSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay_default();
 	}
 	
+	private void effect_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr2() {
+		exitSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
+		enterSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Main_Update_Resetting_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
+		sCIInternal.raiseChronoUpdate();
+		
+		enterSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_default();
+	}
+	
 	private void effect_main_region_digitalwatch_Ticker_Editing_tr0() {
 		exitSequence_main_region_digitalwatch_Ticker_Editing();
 		enterSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder_default();
@@ -397,14 +462,21 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		enterSequence_main_region_digitalwatch_Light_LightOff_default();
 	}
 	
+	/* Entry action for state 'Tick'. */
+	private void entryAction_main_region_digitalwatch_ChronoTicker_Tick() {
+		timer.setTimer(this, 0, 10, false);
+		
+		sCILogicUnit.operationCallback.increaseChronoByOne();
+	}
+	
 	/* Entry action for state 'Temp'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Main_Main_Temp() {
-		timer.setTimer(this, 0, 1500, false);
+		timer.setTimer(this, 1, 1500, false);
 	}
 	
 	/* Entry action for state 'Tick'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Main_Ticker_Tick() {
-		timer.setTimer(this, 1, 1*1000, false);
+		timer.setTimer(this, 2, 1*1000, false);
 		
 		sCILogicUnit.operationCallback.increaseTimeByOne();
 	}
@@ -421,9 +493,16 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		sCIDisplay.operationCallback.refreshChronoDisplay();
 	}
 	
+	/* Entry action for state 'Resetting'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Main_Update_Resetting() {
+		timer.setTimer(this, 3, 1, false);
+		
+		sCILogicUnit.operationCallback.resetChrono();
+	}
+	
 	/* Entry action for state 'Editing'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Editing() {
-		timer.setTimer(this, 2, 5*1000, false);
+		timer.setTimer(this, 4, 5*1000, false);
 		
 		sCILogicUnit.operationCallback.startTimeEditMode();
 	}
@@ -435,35 +514,59 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'Wait'. */
 	private void entryAction_main_region_digitalwatch_Light_Wait() {
-		timer.setTimer(this, 3, 2*1000, false);
+		timer.setTimer(this, 5, 2*1000, false);
+	}
+	
+	/* Exit action for state 'Tick'. */
+	private void exitAction_main_region_digitalwatch_ChronoTicker_Tick() {
+		timer.unsetTimer(this, 0);
 	}
 	
 	/* Exit action for state 'Temp'. */
 	private void exitAction_main_region_digitalwatch_Ticker_Main_Main_Temp() {
-		timer.unsetTimer(this, 0);
+		timer.unsetTimer(this, 1);
 	}
 	
 	/* Exit action for state 'Tick'. */
 	private void exitAction_main_region_digitalwatch_Ticker_Main_Ticker_Tick() {
-		timer.unsetTimer(this, 1);
+		timer.unsetTimer(this, 2);
+	}
+	
+	/* Exit action for state 'Resetting'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Main_Update_Resetting() {
+		timer.unsetTimer(this, 3);
 	}
 	
 	/* Exit action for state 'Editing'. */
 	private void exitAction_main_region_digitalwatch_Ticker_Editing() {
-		timer.unsetTimer(this, 2);
+		timer.unsetTimer(this, 4);
 	}
 	
 	/* Exit action for state 'Wait'. */
 	private void exitAction_main_region_digitalwatch_Light_Wait() {
-		timer.unsetTimer(this, 3);
+		timer.unsetTimer(this, 5);
 		
 		sCIDisplay.operationCallback.unsetIndiglo();
 	}
 	
 	/* 'default' enter sequence for state digitalwatch */
 	private void enterSequence_main_region_digitalwatch_default() {
+		enterSequence_main_region_digitalwatch_ChronoTicker_default();
 		enterSequence_main_region_digitalwatch_Ticker_default();
 		enterSequence_main_region_digitalwatch_Light_default();
+	}
+	
+	/* 'default' enter sequence for state Tick */
+	private void enterSequence_main_region_digitalwatch_ChronoTicker_Tick_default() {
+		entryAction_main_region_digitalwatch_ChronoTicker_Tick();
+		nextStateIndex = 0;
+		stateVector[0] = State.main_region_digitalwatch_ChronoTicker_Tick;
+	}
+	
+	/* 'default' enter sequence for state Stopped */
+	private void enterSequence_main_region_digitalwatch_ChronoTicker_Stopped_default() {
+		nextStateIndex = 0;
+		stateVector[0] = State.main_region_digitalwatch_ChronoTicker_Stopped;
 	}
 	
 	/* 'default' enter sequence for state Main */
@@ -475,36 +578,43 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* 'default' enter sequence for state Placeholder */
 	private void enterSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder_default() {
-		nextStateIndex = 0;
-		stateVector[0] = State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
+		nextStateIndex = 1;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
 	}
 	
 	/* 'default' enter sequence for state Temp */
 	private void enterSequence_main_region_digitalwatch_Ticker_Main_Main_Temp_default() {
 		entryAction_main_region_digitalwatch_Ticker_Main_Main_Temp();
-		nextStateIndex = 0;
-		stateVector[0] = State.main_region_digitalwatch_Ticker_Main_Main_Temp;
+		nextStateIndex = 1;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Main_Temp;
 	}
 	
 	/* 'default' enter sequence for state Tick */
 	private void enterSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick_default() {
 		entryAction_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
-		nextStateIndex = 1;
-		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Ticker_Tick;
+		nextStateIndex = 2;
+		stateVector[2] = State.main_region_digitalwatch_Ticker_Main_Ticker_Tick;
 	}
 	
 	/* 'default' enter sequence for state TimeDisplay */
 	private void enterSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay_default() {
 		entryAction_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay();
-		nextStateIndex = 2;
-		stateVector[2] = State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay;
+		nextStateIndex = 3;
+		stateVector[3] = State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay;
 	}
 	
 	/* 'default' enter sequence for state ChronoDisplay */
 	private void enterSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_default() {
 		entryAction_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
-		nextStateIndex = 2;
-		stateVector[2] = State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay;
+		nextStateIndex = 3;
+		stateVector[3] = State.main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay;
+	}
+	
+	/* 'default' enter sequence for state Resetting */
+	private void enterSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting_default() {
+		entryAction_main_region_digitalwatch_Ticker_Main_Update_Resetting();
+		nextStateIndex = 3;
+		stateVector[3] = State.main_region_digitalwatch_Ticker_Main_Update_Resetting;
 	}
 	
 	/* 'default' enter sequence for state Editing */
@@ -515,33 +625,38 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* 'default' enter sequence for state HEhe */
 	private void enterSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe_default() {
-		nextStateIndex = 0;
-		stateVector[0] = State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
+		nextStateIndex = 1;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
 	}
 	
 	/* 'default' enter sequence for state LightOff */
 	private void enterSequence_main_region_digitalwatch_Light_LightOff_default() {
-		nextStateIndex = 3;
-		stateVector[3] = State.main_region_digitalwatch_Light_LightOff;
+		nextStateIndex = 4;
+		stateVector[4] = State.main_region_digitalwatch_Light_LightOff;
 	}
 	
 	/* 'default' enter sequence for state LightOn */
 	private void enterSequence_main_region_digitalwatch_Light_LightOn_default() {
 		entryAction_main_region_digitalwatch_Light_LightOn();
-		nextStateIndex = 3;
-		stateVector[3] = State.main_region_digitalwatch_Light_LightOn;
+		nextStateIndex = 4;
+		stateVector[4] = State.main_region_digitalwatch_Light_LightOn;
 	}
 	
 	/* 'default' enter sequence for state Wait */
 	private void enterSequence_main_region_digitalwatch_Light_Wait_default() {
 		entryAction_main_region_digitalwatch_Light_Wait();
-		nextStateIndex = 3;
-		stateVector[3] = State.main_region_digitalwatch_Light_Wait;
+		nextStateIndex = 4;
+		stateVector[4] = State.main_region_digitalwatch_Light_Wait;
 	}
 	
 	/* 'default' enter sequence for region main region */
 	private void enterSequence_main_region_default() {
 		react_main_region__entry_Default();
+	}
+	
+	/* 'default' enter sequence for region ChronoTicker */
+	private void enterSequence_main_region_digitalwatch_ChronoTicker_default() {
+		react_main_region_digitalwatch_ChronoTicker__entry_Default();
 	}
 	
 	/* 'default' enter sequence for region Ticker */
@@ -574,6 +689,20 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		react_main_region_digitalwatch_Light__entry_Default();
 	}
 	
+	/* Default exit sequence for state Tick */
+	private void exitSequence_main_region_digitalwatch_ChronoTicker_Tick() {
+		nextStateIndex = 0;
+		stateVector[0] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_ChronoTicker_Tick();
+	}
+	
+	/* Default exit sequence for state Stopped */
+	private void exitSequence_main_region_digitalwatch_ChronoTicker_Stopped() {
+		nextStateIndex = 0;
+		stateVector[0] = State.$NullState$;
+	}
+	
 	/* Default exit sequence for state Main */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main() {
 		exitSequence_main_region_digitalwatch_Ticker_Main_Main();
@@ -583,36 +712,44 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for state Placeholder */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder() {
-		nextStateIndex = 0;
-		stateVector[0] = State.$NullState$;
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
 	}
 	
 	/* Default exit sequence for state Temp */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp() {
-		nextStateIndex = 0;
-		stateVector[0] = State.$NullState$;
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
 		
 		exitAction_main_region_digitalwatch_Ticker_Main_Main_Temp();
 	}
 	
 	/* Default exit sequence for state Tick */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick() {
-		nextStateIndex = 1;
-		stateVector[1] = State.$NullState$;
+		nextStateIndex = 2;
+		stateVector[2] = State.$NullState$;
 		
 		exitAction_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
 	}
 	
 	/* Default exit sequence for state TimeDisplay */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay() {
-		nextStateIndex = 2;
-		stateVector[2] = State.$NullState$;
+		nextStateIndex = 3;
+		stateVector[3] = State.$NullState$;
 	}
 	
 	/* Default exit sequence for state ChronoDisplay */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay() {
-		nextStateIndex = 2;
-		stateVector[2] = State.$NullState$;
+		nextStateIndex = 3;
+		stateVector[3] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state Resetting */
+	private void exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting() {
+		nextStateIndex = 3;
+		stateVector[3] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 	}
 	
 	/* Default exit sequence for state Editing */
@@ -623,26 +760,26 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for state HEhe */
 	private void exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe() {
-		nextStateIndex = 0;
-		stateVector[0] = State.$NullState$;
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
 	}
 	
 	/* Default exit sequence for state LightOff */
 	private void exitSequence_main_region_digitalwatch_Light_LightOff() {
-		nextStateIndex = 3;
-		stateVector[3] = State.$NullState$;
+		nextStateIndex = 4;
+		stateVector[4] = State.$NullState$;
 	}
 	
 	/* Default exit sequence for state LightOn */
 	private void exitSequence_main_region_digitalwatch_Light_LightOn() {
-		nextStateIndex = 3;
-		stateVector[3] = State.$NullState$;
+		nextStateIndex = 4;
+		stateVector[4] = State.$NullState$;
 	}
 	
 	/* Default exit sequence for state Wait */
 	private void exitSequence_main_region_digitalwatch_Light_Wait() {
-		nextStateIndex = 3;
-		stateVector[3] = State.$NullState$;
+		nextStateIndex = 4;
+		stateVector[4] = State.$NullState$;
 		
 		exitAction_main_region_digitalwatch_Light_Wait();
 	}
@@ -650,6 +787,17 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	/* Default exit sequence for region main region */
 	private void exitSequence_main_region() {
 		switch (stateVector[0]) {
+		case main_region_digitalwatch_ChronoTicker_Tick:
+			exitSequence_main_region_digitalwatch_ChronoTicker_Tick();
+			break;
+		case main_region_digitalwatch_ChronoTicker_Stopped:
+			exitSequence_main_region_digitalwatch_ChronoTicker_Stopped();
+			break;
+		default:
+			break;
+		}
+		
+		switch (stateVector[1]) {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
@@ -664,7 +812,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		}
 		
-		switch (stateVector[1]) {
+		switch (stateVector[2]) {
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
 			break;
@@ -672,18 +820,21 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		}
 		
-		switch (stateVector[2]) {
+		switch (stateVector[3]) {
 		case main_region_digitalwatch_Ticker_Main_Update_TimeDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay();
 			break;
 		case main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
 			break;
+		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
+			break;
 		default:
 			break;
 		}
 		
-		switch (stateVector[3]) {
+		switch (stateVector[4]) {
 		case main_region_digitalwatch_Light_LightOff:
 			exitSequence_main_region_digitalwatch_Light_LightOff();
 			break;
@@ -698,9 +849,23 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 	}
 	
+	/* Default exit sequence for region ChronoTicker */
+	private void exitSequence_main_region_digitalwatch_ChronoTicker() {
+		switch (stateVector[0]) {
+		case main_region_digitalwatch_ChronoTicker_Tick:
+			exitSequence_main_region_digitalwatch_ChronoTicker_Tick();
+			break;
+		case main_region_digitalwatch_ChronoTicker_Stopped:
+			exitSequence_main_region_digitalwatch_ChronoTicker_Stopped();
+			break;
+		default:
+			break;
+		}
+	}
+	
 	/* Default exit sequence for region Ticker */
 	private void exitSequence_main_region_digitalwatch_Ticker() {
-		switch (stateVector[0]) {
+		switch (stateVector[1]) {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
@@ -715,7 +880,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		}
 		
-		switch (stateVector[1]) {
+		switch (stateVector[2]) {
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
 			break;
@@ -723,12 +888,15 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		}
 		
-		switch (stateVector[2]) {
+		switch (stateVector[3]) {
 		case main_region_digitalwatch_Ticker_Main_Update_TimeDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay();
 			break;
 		case main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
+			break;
+		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 			break;
 		default:
 			break;
@@ -737,7 +905,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for region Main */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Main() {
-		switch (stateVector[0]) {
+		switch (stateVector[1]) {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
@@ -751,7 +919,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for region Ticker */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Ticker() {
-		switch (stateVector[1]) {
+		switch (stateVector[2]) {
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
 			break;
@@ -762,12 +930,15 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for region Update */
 	private void exitSequence_main_region_digitalwatch_Ticker_Main_Update() {
-		switch (stateVector[2]) {
+		switch (stateVector[3]) {
 		case main_region_digitalwatch_Ticker_Main_Update_TimeDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_TimeDisplay();
 			break;
 		case main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
+			break;
+		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 			break;
 		default:
 			break;
@@ -776,7 +947,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for region Editing */
 	private void exitSequence_main_region_digitalwatch_Ticker_Editing_Editing() {
-		switch (stateVector[0]) {
+		switch (stateVector[1]) {
 		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
 			exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();
 			break;
@@ -787,7 +958,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for region Light */
 	private void exitSequence_main_region_digitalwatch_Light() {
-		switch (stateVector[3]) {
+		switch (stateVector[4]) {
 		case main_region_digitalwatch_Light_LightOff:
 			exitSequence_main_region_digitalwatch_Light_LightOff();
 			break;
@@ -799,6 +970,24 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		default:
 			break;
+		}
+	}
+	
+	/* The reactions of state Tick. */
+	private void react_main_region_digitalwatch_ChronoTicker_Tick() {
+		if (check_main_region_digitalwatch_ChronoTicker_Tick_tr0_tr0()) {
+			effect_main_region_digitalwatch_ChronoTicker_Tick_tr0();
+		} else {
+			if (check_main_region_digitalwatch_ChronoTicker_Tick_tr1_tr1()) {
+				effect_main_region_digitalwatch_ChronoTicker_Tick_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state Stopped. */
+	private void react_main_region_digitalwatch_ChronoTicker_Stopped() {
+		if (check_main_region_digitalwatch_ChronoTicker_Stopped_tr0_tr0()) {
+			effect_main_region_digitalwatch_ChronoTicker_Stopped_tr0();
 		}
 	}
 	
@@ -845,7 +1034,18 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		} else {
 			if (check_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr1_tr1()) {
 				effect_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr1();
+			} else {
+				if (check_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr2_tr2()) {
+					effect_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay_tr2();
+				}
 			}
+		}
+	}
+	
+	/* The reactions of state Resetting. */
+	private void react_main_region_digitalwatch_Ticker_Main_Update_Resetting() {
+		if (check_main_region_digitalwatch_Ticker_Main_Update_Resetting_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Main_Update_Resetting_tr0();
 		}
 	}
 	
@@ -881,6 +1081,11 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	/* Default react sequence for initial entry  */
 	private void react_main_region__entry_Default() {
 		enterSequence_main_region_digitalwatch_default();
+	}
+	
+	/* Default react sequence for initial entry  */
+	private void react_main_region_digitalwatch_ChronoTicker__entry_Default() {
+		enterSequence_main_region_digitalwatch_ChronoTicker_Stopped_default();
 	}
 	
 	/* Default react sequence for initial entry  */
@@ -920,6 +1125,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		clearOutEvents();
 		for (nextStateIndex = 0; nextStateIndex < stateVector.length; nextStateIndex++) {
 			switch (stateVector[nextStateIndex]) {
+			case main_region_digitalwatch_ChronoTicker_Tick:
+				react_main_region_digitalwatch_ChronoTicker_Tick();
+				break;
+			case main_region_digitalwatch_ChronoTicker_Stopped:
+				react_main_region_digitalwatch_ChronoTicker_Stopped();
+				break;
 			case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 				react_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 				break;
@@ -934,6 +1145,9 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 				break;
 			case main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay:
 				react_main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay();
+				break;
+			case main_region_digitalwatch_Ticker_Main_Update_Resetting:
+				react_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 				break;
 			case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
 				react_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();

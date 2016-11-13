@@ -105,6 +105,8 @@ public interface IDigitalwatchStatemachine extends ITimerCallback,IStatemachine 
 	
 		public void raiseUpdate();
 		
+		public void raiseChronoUpdate();
+		
 	}
 	
 	public SCIInternal getSCIInternal();
