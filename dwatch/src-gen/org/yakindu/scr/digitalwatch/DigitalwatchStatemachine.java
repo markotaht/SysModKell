@@ -130,13 +130,18 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		main_region_digitalwatch_ChronoTicker_Stopped,
 		main_region_digitalwatch_Ticker_Main,
 		main_region_digitalwatch_Ticker_Main_Main_Placeholder,
-		main_region_digitalwatch_Ticker_Main_Main_Temp,
+		main_region_digitalwatch_Ticker_Main_Main_toTimeEdit,
 		main_region_digitalwatch_Ticker_Main_Ticker_Tick,
 		main_region_digitalwatch_Ticker_Main_Update_TimeDisplay,
 		main_region_digitalwatch_Ticker_Main_Update_ChronoDisplay,
 		main_region_digitalwatch_Ticker_Main_Update_Resetting,
 		main_region_digitalwatch_Ticker_Editing,
-		main_region_digitalwatch_Ticker_Editing_Editing_HEhe,
+		main_region_digitalwatch_Ticker_Editing_increase_idle,
+		main_region_digitalwatch_Ticker_Editing_increase_increaseSelection,
+		main_region_digitalwatch_Ticker_Editing_changeSelection_idle,
+		main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection,
+		main_region_digitalwatch_Ticker_Editing_blinker_hideSelection,
+		main_region_digitalwatch_Ticker_Editing_blinker_showSelection,
 		main_region_digitalwatch_Light_LightOff,
 		main_region_digitalwatch_Light_LightOn,
 		main_region_digitalwatch_Light_Wait,
@@ -149,7 +154,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	private ITimer timer;
 	
-	private final boolean[] timeEvents = new boolean[6];
+	private final boolean[] timeEvents = new boolean[10];
 	public DigitalwatchStatemachine() {
 		sCIButtons = new SCIButtonsImpl();
 		sCIDisplay = new SCIDisplayImpl();
@@ -235,8 +240,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 					main_region_digitalwatch_Ticker_Main.ordinal()&& stateVector[1].ordinal() <= State.main_region_digitalwatch_Ticker_Main_Update_Resetting.ordinal();
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
-		case main_region_digitalwatch_Ticker_Main_Main_Temp:
-			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Main_Temp;
+		case main_region_digitalwatch_Ticker_Main_Main_toTimeEdit:
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Main_Main_toTimeEdit;
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			return stateVector[2] == State.main_region_digitalwatch_Ticker_Main_Ticker_Tick;
 		case main_region_digitalwatch_Ticker_Main_Update_TimeDisplay:
@@ -247,9 +252,19 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			return stateVector[3] == State.main_region_digitalwatch_Ticker_Main_Update_Resetting;
 		case main_region_digitalwatch_Ticker_Editing:
 			return stateVector[1].ordinal() >= State.
-					main_region_digitalwatch_Ticker_Editing.ordinal()&& stateVector[1].ordinal() <= State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe.ordinal();
-		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-			return stateVector[1] == State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
+					main_region_digitalwatch_Ticker_Editing.ordinal()&& stateVector[1].ordinal() <= State.main_region_digitalwatch_Ticker_Editing_blinker_showSelection.ordinal();
+		case main_region_digitalwatch_Ticker_Editing_increase_idle:
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Editing_increase_idle;
+		case main_region_digitalwatch_Ticker_Editing_increase_increaseSelection:
+			return stateVector[1] == State.main_region_digitalwatch_Ticker_Editing_increase_increaseSelection;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_idle:
+			return stateVector[2] == State.main_region_digitalwatch_Ticker_Editing_changeSelection_idle;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection:
+			return stateVector[2] == State.main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection;
+		case main_region_digitalwatch_Ticker_Editing_blinker_hideSelection:
+			return stateVector[3] == State.main_region_digitalwatch_Ticker_Editing_blinker_hideSelection;
+		case main_region_digitalwatch_Ticker_Editing_blinker_showSelection:
+			return stateVector[3] == State.main_region_digitalwatch_Ticker_Editing_blinker_showSelection;
 		case main_region_digitalwatch_Light_LightOff:
 			return stateVector[4] == State.main_region_digitalwatch_Light_LightOff;
 		case main_region_digitalwatch_Light_LightOn:
@@ -317,11 +332,11 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		return sCIButtons.bottomRightPressed;
 	}
 	
-	private boolean check_main_region_digitalwatch_Ticker_Main_Main_Temp_tr0_tr0() {
+	private boolean check_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr0_tr0() {
 		return sCIButtons.bottomRightReleased;
 	}
 	
-	private boolean check_main_region_digitalwatch_Ticker_Main_Main_Temp_tr1_tr1() {
+	private boolean check_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr1_tr1() {
 		return timeEvents[1];
 	}
 	
@@ -353,8 +368,40 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		return timeEvents[3];
 	}
 	
-	private boolean check_main_region_digitalwatch_Ticker_Editing_tr0_tr0() {
+	private boolean check_main_region_digitalwatch_Ticker_Editing_increase_idle_tr0_tr0() {
+		return sCIButtons.bottomLeftPressed;
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_increase_idle_tr1_tr1() {
 		return timeEvents[4];
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr0_tr0() {
+		return sCIButtons.bottomLeftReleased;
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr1_tr1() {
+		return timeEvents[5];
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_tr0_tr0() {
+		return sCIButtons.bottomRightPressed;
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr0_tr0() {
+		return sCIButtons.bottomRightReleased;
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr1_tr1() {
+		return timeEvents[6];
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_tr0_tr0() {
+		return (timeEvents[7]) && (isStateActive(State.main_region_digitalwatch_Ticker_Editing_increase_idle));
+	}
+	
+	private boolean check_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_tr0_tr0() {
+		return timeEvents[8];
 	}
 	
 	private boolean check_main_region_digitalwatch_Light_LightOff_tr0_tr0() {
@@ -366,7 +413,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Light_Wait_tr0_tr0() {
-		return timeEvents[5];
+		return timeEvents[9];
 	}
 	
 	private void effect_main_region_digitalwatch_ChronoTicker_Tick_tr0() {
@@ -388,15 +435,15 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	private void effect_main_region_digitalwatch_Ticker_Main_Main_Placeholder_tr0() {
 		exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
-		enterSequence_main_region_digitalwatch_Ticker_Main_Main_Temp_default();
+		enterSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_default();
 	}
 	
-	private void effect_main_region_digitalwatch_Ticker_Main_Main_Temp_tr0() {
-		exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp();
+	private void effect_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 		enterSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder_default();
 	}
 	
-	private void effect_main_region_digitalwatch_Ticker_Main_Main_Temp_tr1() {
+	private void effect_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr1() {
 		exitSequence_main_region_digitalwatch_Ticker_Main();
 		enterSequence_main_region_digitalwatch_Ticker_Editing_default();
 	}
@@ -447,6 +494,51 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		enterSequence_main_region_digitalwatch_Ticker_Main_Update_default();
 	}
 	
+	private void effect_main_region_digitalwatch_Ticker_Editing_increase_idle_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_increase_idle_tr1() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle();
+		react_main_region_digitalwatch_Ticker_Editing_increase__exit_Default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_increase_idle_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr1() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr1() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+		react_main_region_digitalwatch_Ticker_Editing_changeSelection__exit_Default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_tr0() {
+		exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_default();
+	}
+	
 	private void effect_main_region_digitalwatch_Light_LightOff_tr0() {
 		exitSequence_main_region_digitalwatch_Light_LightOff();
 		enterSequence_main_region_digitalwatch_Light_LightOn_default();
@@ -469,9 +561,9 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		sCILogicUnit.operationCallback.increaseChronoByOne();
 	}
 	
-	/* Entry action for state 'Temp'. */
-	private void entryAction_main_region_digitalwatch_Ticker_Main_Main_Temp() {
-		timer.setTimer(this, 1, 1500, false);
+	/* Entry action for state 'toTimeEdit'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit() {
+		timer.setTimer(this, 1, 1, false);
 	}
 	
 	/* Entry action for state 'Tick'. */
@@ -502,9 +594,48 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'Editing'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Editing() {
-		timer.setTimer(this, 4, 5*1000, false);
-		
 		sCILogicUnit.operationCallback.startTimeEditMode();
+	}
+	
+	/* Entry action for state 'idle'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Editing_increase_idle() {
+		timer.setTimer(this, 4, 5*1000, false);
+	}
+	
+	/* Entry action for state 'increaseSelection'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection() {
+		timer.setTimer(this, 5, 300, false);
+		
+		sCILogicUnit.operationCallback.increaseSelection();
+		
+		sCIDisplay.operationCallback.refreshTimeDisplay();
+		
+		sCIDisplay.operationCallback.refreshDateDisplay();
+	}
+	
+	/* Entry action for state 'increaseSelection'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection() {
+		timer.setTimer(this, 6, 2*1000, false);
+		
+		sCILogicUnit.operationCallback.selectNext();
+		
+		sCIDisplay.operationCallback.refreshTimeDisplay();
+		
+		sCIDisplay.operationCallback.refreshDateDisplay();
+	}
+	
+	/* Entry action for state 'hideSelection'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
+		timer.setTimer(this, 7, 500, false);
+		
+		sCIDisplay.operationCallback.hideSelection();
+	}
+	
+	/* Entry action for state 'showSelection'. */
+	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_showSelection() {
+		timer.setTimer(this, 8, 500, false);
+		
+		sCIDisplay.operationCallback.showSelection();
 	}
 	
 	/* Entry action for state 'LightOn'. */
@@ -514,7 +645,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'Wait'. */
 	private void entryAction_main_region_digitalwatch_Light_Wait() {
-		timer.setTimer(this, 5, 2*1000, false);
+		timer.setTimer(this, 9, 2*1000, false);
 	}
 	
 	/* Exit action for state 'Tick'. */
@@ -522,8 +653,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		timer.unsetTimer(this, 0);
 	}
 	
-	/* Exit action for state 'Temp'. */
-	private void exitAction_main_region_digitalwatch_Ticker_Main_Main_Temp() {
+	/* Exit action for state 'toTimeEdit'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit() {
 		timer.unsetTimer(this, 1);
 	}
 	
@@ -537,14 +668,34 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		timer.unsetTimer(this, 3);
 	}
 	
-	/* Exit action for state 'Editing'. */
-	private void exitAction_main_region_digitalwatch_Ticker_Editing() {
+	/* Exit action for state 'idle'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Editing_increase_idle() {
 		timer.unsetTimer(this, 4);
+	}
+	
+	/* Exit action for state 'increaseSelection'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection() {
+		timer.unsetTimer(this, 5);
+	}
+	
+	/* Exit action for state 'increaseSelection'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection() {
+		timer.unsetTimer(this, 6);
+	}
+	
+	/* Exit action for state 'hideSelection'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
+		timer.unsetTimer(this, 7);
+	}
+	
+	/* Exit action for state 'showSelection'. */
+	private void exitAction_main_region_digitalwatch_Ticker_Editing_blinker_showSelection() {
+		timer.unsetTimer(this, 8);
 	}
 	
 	/* Exit action for state 'Wait'. */
 	private void exitAction_main_region_digitalwatch_Light_Wait() {
-		timer.unsetTimer(this, 5);
+		timer.unsetTimer(this, 9);
 		
 		sCIDisplay.operationCallback.unsetIndiglo();
 	}
@@ -582,11 +733,11 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Main_Placeholder;
 	}
 	
-	/* 'default' enter sequence for state Temp */
-	private void enterSequence_main_region_digitalwatch_Ticker_Main_Main_Temp_default() {
-		entryAction_main_region_digitalwatch_Ticker_Main_Main_Temp();
+	/* 'default' enter sequence for state toTimeEdit */
+	private void enterSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_default() {
+		entryAction_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 		nextStateIndex = 1;
-		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Main_Temp;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Main_Main_toTimeEdit;
 	}
 	
 	/* 'default' enter sequence for state Tick */
@@ -620,13 +771,50 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	/* 'default' enter sequence for state Editing */
 	private void enterSequence_main_region_digitalwatch_Ticker_Editing_default() {
 		entryAction_main_region_digitalwatch_Ticker_Editing();
-		enterSequence_main_region_digitalwatch_Ticker_Editing_Editing_default();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_increase_default();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_default();
+		enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_default();
 	}
 	
-	/* 'default' enter sequence for state HEhe */
-	private void enterSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe_default() {
+	/* 'default' enter sequence for state idle */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_increase_idle_default() {
+		entryAction_main_region_digitalwatch_Ticker_Editing_increase_idle();
 		nextStateIndex = 1;
-		stateVector[1] = State.main_region_digitalwatch_Ticker_Editing_Editing_HEhe;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Editing_increase_idle;
+	}
+	
+	/* 'default' enter sequence for state increaseSelection */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_default() {
+		entryAction_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+		nextStateIndex = 1;
+		stateVector[1] = State.main_region_digitalwatch_Ticker_Editing_increase_increaseSelection;
+	}
+	
+	/* 'default' enter sequence for state idle */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_default() {
+		nextStateIndex = 2;
+		stateVector[2] = State.main_region_digitalwatch_Ticker_Editing_changeSelection_idle;
+	}
+	
+	/* 'default' enter sequence for state increaseSelection */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_default() {
+		entryAction_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+		nextStateIndex = 2;
+		stateVector[2] = State.main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection;
+	}
+	
+	/* 'default' enter sequence for state hideSelection */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_default() {
+		entryAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+		nextStateIndex = 3;
+		stateVector[3] = State.main_region_digitalwatch_Ticker_Editing_blinker_hideSelection;
+	}
+	
+	/* 'default' enter sequence for state showSelection */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_default() {
+		entryAction_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
+		nextStateIndex = 3;
+		stateVector[3] = State.main_region_digitalwatch_Ticker_Editing_blinker_showSelection;
 	}
 	
 	/* 'default' enter sequence for state LightOff */
@@ -679,9 +867,19 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		react_main_region_digitalwatch_Ticker_Main_Update__entry_Default();
 	}
 	
-	/* 'default' enter sequence for region Editing */
-	private void enterSequence_main_region_digitalwatch_Ticker_Editing_Editing_default() {
-		react_main_region_digitalwatch_Ticker_Editing_Editing__entry_Default();
+	/* 'default' enter sequence for region increase */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_increase_default() {
+		react_main_region_digitalwatch_Ticker_Editing_increase__entry_Default();
+	}
+	
+	/* 'default' enter sequence for region changeSelection */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_default() {
+		react_main_region_digitalwatch_Ticker_Editing_changeSelection__entry_Default();
+	}
+	
+	/* 'default' enter sequence for region blinker */
+	private void enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_default() {
+		react_main_region_digitalwatch_Ticker_Editing_blinker__entry_Default();
 	}
 	
 	/* 'default' enter sequence for region Light */
@@ -716,12 +914,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		stateVector[1] = State.$NullState$;
 	}
 	
-	/* Default exit sequence for state Temp */
-	private void exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp() {
+	/* Default exit sequence for state toTimeEdit */
+	private void exitSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit() {
 		nextStateIndex = 1;
 		stateVector[1] = State.$NullState$;
 		
-		exitAction_main_region_digitalwatch_Ticker_Main_Main_Temp();
+		exitAction_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 	}
 	
 	/* Default exit sequence for state Tick */
@@ -754,14 +952,55 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default exit sequence for state Editing */
 	private void exitSequence_main_region_digitalwatch_Ticker_Editing() {
-		exitSequence_main_region_digitalwatch_Ticker_Editing_Editing();
-		exitAction_main_region_digitalwatch_Ticker_Editing();
+		exitSequence_main_region_digitalwatch_Ticker_Editing_increase();
+		exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection();
+		exitSequence_main_region_digitalwatch_Ticker_Editing_blinker();
 	}
 	
-	/* Default exit sequence for state HEhe */
-	private void exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe() {
+	/* Default exit sequence for state idle */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle() {
 		nextStateIndex = 1;
 		stateVector[1] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Editing_increase_idle();
+	}
+	
+	/* Default exit sequence for state increaseSelection */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection() {
+		nextStateIndex = 1;
+		stateVector[1] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+	}
+	
+	/* Default exit sequence for state idle */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle() {
+		nextStateIndex = 2;
+		stateVector[2] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state increaseSelection */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection() {
+		nextStateIndex = 2;
+		stateVector[2] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+	}
+	
+	/* Default exit sequence for state hideSelection */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
+		nextStateIndex = 3;
+		stateVector[3] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+	}
+	
+	/* Default exit sequence for state showSelection */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection() {
+		nextStateIndex = 3;
+		stateVector[3] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
 	}
 	
 	/* Default exit sequence for state LightOff */
@@ -801,12 +1040,14 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
-		case main_region_digitalwatch_Ticker_Main_Main_Temp:
-			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp();
+		case main_region_digitalwatch_Ticker_Main_Main_toTimeEdit:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 			break;
-		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-			exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();
-			exitAction_main_region_digitalwatch_Ticker_Editing();
+		case main_region_digitalwatch_Ticker_Editing_increase_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_increase_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
 			break;
 		default:
 			break;
@@ -815,6 +1056,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		switch (stateVector[2]) {
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
 			break;
 		default:
 			break;
@@ -829,6 +1076,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			break;
 		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_blinker_hideSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_blinker_showSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
 			break;
 		default:
 			break;
@@ -869,12 +1122,14 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
-		case main_region_digitalwatch_Ticker_Main_Main_Temp:
-			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp();
+		case main_region_digitalwatch_Ticker_Main_Main_toTimeEdit:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 			break;
-		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-			exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();
-			exitAction_main_region_digitalwatch_Ticker_Editing();
+		case main_region_digitalwatch_Ticker_Editing_increase_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_increase_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
 			break;
 		default:
 			break;
@@ -883,6 +1138,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		switch (stateVector[2]) {
 		case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
 			break;
 		default:
 			break;
@@ -898,6 +1159,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		case main_region_digitalwatch_Ticker_Main_Update_Resetting:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 			break;
+		case main_region_digitalwatch_Ticker_Editing_blinker_hideSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_blinker_showSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
+			break;
 		default:
 			break;
 		}
@@ -909,8 +1176,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 			break;
-		case main_region_digitalwatch_Ticker_Main_Main_Temp:
-			exitSequence_main_region_digitalwatch_Ticker_Main_Main_Temp();
+		case main_region_digitalwatch_Ticker_Main_Main_toTimeEdit:
+			exitSequence_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 			break;
 		default:
 			break;
@@ -945,11 +1212,42 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 	}
 	
-	/* Default exit sequence for region Editing */
-	private void exitSequence_main_region_digitalwatch_Ticker_Editing_Editing() {
+	/* Default exit sequence for region increase */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_increase() {
 		switch (stateVector[1]) {
-		case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-			exitSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();
+		case main_region_digitalwatch_Ticker_Editing_increase_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_increase_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/* Default exit sequence for region changeSelection */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection() {
+		switch (stateVector[2]) {
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_idle:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/* Default exit sequence for region blinker */
+	private void exitSequence_main_region_digitalwatch_Ticker_Editing_blinker() {
+		switch (stateVector[3]) {
+		case main_region_digitalwatch_Ticker_Editing_blinker_hideSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+			break;
+		case main_region_digitalwatch_Ticker_Editing_blinker_showSelection:
+			exitSequence_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
 			break;
 		default:
 			break;
@@ -998,13 +1296,13 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 	}
 	
-	/* The reactions of state Temp. */
-	private void react_main_region_digitalwatch_Ticker_Main_Main_Temp() {
-		if (check_main_region_digitalwatch_Ticker_Main_Main_Temp_tr0_tr0()) {
-			effect_main_region_digitalwatch_Ticker_Main_Main_Temp_tr0();
+	/* The reactions of state toTimeEdit. */
+	private void react_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit() {
+		if (check_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr0();
 		} else {
-			if (check_main_region_digitalwatch_Ticker_Main_Main_Temp_tr1_tr1()) {
-				effect_main_region_digitalwatch_Ticker_Main_Main_Temp_tr1();
+			if (check_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr1_tr1()) {
+				effect_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr1();
 			}
 		}
 	}
@@ -1049,11 +1347,57 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 	}
 	
-	/* The reactions of state HEhe. */
-	private void react_main_region_digitalwatch_Ticker_Editing_Editing_HEhe() {
-		if (check_main_region_digitalwatch_Ticker_Editing_tr0_tr0()) {
-			effect_main_region_digitalwatch_Ticker_Editing_tr0();
+	/* The reactions of state idle. */
+	private void react_main_region_digitalwatch_Ticker_Editing_increase_idle() {
+		if (check_main_region_digitalwatch_Ticker_Editing_increase_idle_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_increase_idle_tr0();
 		} else {
+			if (check_main_region_digitalwatch_Ticker_Editing_increase_idle_tr1_tr1()) {
+				effect_main_region_digitalwatch_Ticker_Editing_increase_idle_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state increaseSelection. */
+	private void react_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection() {
+		if (check_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr0();
+		} else {
+			if (check_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr1_tr1()) {
+				effect_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state idle. */
+	private void react_main_region_digitalwatch_Ticker_Editing_changeSelection_idle() {
+		if (check_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_tr0();
+		}
+	}
+	
+	/* The reactions of state increaseSelection. */
+	private void react_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection() {
+		if (check_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr0();
+		} else {
+			if (check_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr1_tr1()) {
+				effect_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state hideSelection. */
+	private void react_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
+		if (check_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_tr0();
+		}
+	}
+	
+	/* The reactions of state showSelection. */
+	private void react_main_region_digitalwatch_Ticker_Editing_blinker_showSelection() {
+		if (check_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_tr0_tr0()) {
+			effect_main_region_digitalwatch_Ticker_Editing_blinker_showSelection_tr0();
 		}
 	}
 	
@@ -1109,13 +1453,33 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	/* Default react sequence for initial entry  */
-	private void react_main_region_digitalwatch_Ticker_Editing_Editing__entry_Default() {
-		enterSequence_main_region_digitalwatch_Ticker_Editing_Editing_HEhe_default();
+	private void react_main_region_digitalwatch_Ticker_Editing_increase__entry_Default() {
+		enterSequence_main_region_digitalwatch_Ticker_Editing_increase_idle_default();
+	}
+	
+	/* Default react sequence for initial entry  */
+	private void react_main_region_digitalwatch_Ticker_Editing_changeSelection__entry_Default() {
+		enterSequence_main_region_digitalwatch_Ticker_Editing_changeSelection_idle_default();
+	}
+	
+	/* Default react sequence for initial entry  */
+	private void react_main_region_digitalwatch_Ticker_Editing_blinker__entry_Default() {
+		enterSequence_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection_default();
 	}
 	
 	/* Default react sequence for initial entry  */
 	private void react_main_region_digitalwatch_Light__entry_Default() {
 		enterSequence_main_region_digitalwatch_Light_LightOff_default();
+	}
+	
+	/* The reactions of exit default. */
+	private void react_main_region_digitalwatch_Ticker_Editing_increase__exit_Default() {
+		effect_main_region_digitalwatch_Ticker_Editing_tr0();
+	}
+	
+	/* The reactions of exit default. */
+	private void react_main_region_digitalwatch_Ticker_Editing_changeSelection__exit_Default() {
+		effect_main_region_digitalwatch_Ticker_Editing_tr0();
 	}
 	
 	public void runCycle() {
@@ -1134,8 +1498,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			case main_region_digitalwatch_Ticker_Main_Main_Placeholder:
 				react_main_region_digitalwatch_Ticker_Main_Main_Placeholder();
 				break;
-			case main_region_digitalwatch_Ticker_Main_Main_Temp:
-				react_main_region_digitalwatch_Ticker_Main_Main_Temp();
+			case main_region_digitalwatch_Ticker_Main_Main_toTimeEdit:
+				react_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit();
 				break;
 			case main_region_digitalwatch_Ticker_Main_Ticker_Tick:
 				react_main_region_digitalwatch_Ticker_Main_Ticker_Tick();
@@ -1149,8 +1513,23 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			case main_region_digitalwatch_Ticker_Main_Update_Resetting:
 				react_main_region_digitalwatch_Ticker_Main_Update_Resetting();
 				break;
-			case main_region_digitalwatch_Ticker_Editing_Editing_HEhe:
-				react_main_region_digitalwatch_Ticker_Editing_Editing_HEhe();
+			case main_region_digitalwatch_Ticker_Editing_increase_idle:
+				react_main_region_digitalwatch_Ticker_Editing_increase_idle();
+				break;
+			case main_region_digitalwatch_Ticker_Editing_increase_increaseSelection:
+				react_main_region_digitalwatch_Ticker_Editing_increase_increaseSelection();
+				break;
+			case main_region_digitalwatch_Ticker_Editing_changeSelection_idle:
+				react_main_region_digitalwatch_Ticker_Editing_changeSelection_idle();
+				break;
+			case main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection:
+				react_main_region_digitalwatch_Ticker_Editing_changeSelection_increaseSelection();
+				break;
+			case main_region_digitalwatch_Ticker_Editing_blinker_hideSelection:
+				react_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection();
+				break;
+			case main_region_digitalwatch_Ticker_Editing_blinker_showSelection:
+				react_main_region_digitalwatch_Ticker_Editing_blinker_showSelection();
 				break;
 			case main_region_digitalwatch_Light_LightOff:
 				react_main_region_digitalwatch_Light_LightOff();
