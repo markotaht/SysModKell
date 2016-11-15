@@ -385,7 +385,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Main_Placeholder_tr1_tr1() {
-		return sCIButtons.bottomLeftPressed;
+		return (sCIButtons.bottomLeftPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay));
 	}
 	
 	private boolean check_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit_tr0_tr0() {
