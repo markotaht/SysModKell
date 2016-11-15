@@ -100,10 +100,10 @@
                 <outgoingTransitions xmi:id="_1DdmYKpoEeaBVaJDWwr19A" target="_1DajEKpoEeaBVaJDWwr19A"/>
               </vertices>
               <vertices xsi:type="sgraph:State" xmi:id="_1DajEKpoEeaBVaJDWwr19A" specification="entry/Display.showSelection()" name="hideSelection" incomingTransitions="_1DdmYKpoEeaBVaJDWwr19A _1DPkM6poEeaBVaJDWwr19A">
-                <outgoingTransitions xmi:id="_1DbKKapoEeaBVaJDWwr19A" specification="after 500 ms [active(digitalwatch.Ticker.Editing.increase.idle)]  " target="_1DPkHapoEeaBVaJDWwr19A"/>
+                <outgoingTransitions xmi:id="_1DbKKapoEeaBVaJDWwr19A" specification="after 250 ms [active(digitalwatch.Ticker.Editing.increase.idle)]  " target="_1DPkHapoEeaBVaJDWwr19A"/>
               </vertices>
               <vertices xsi:type="sgraph:State" xmi:id="_1DPkHapoEeaBVaJDWwr19A" specification="entry/Display.showSelection()" name="showSelection" incomingTransitions="_1DbKKapoEeaBVaJDWwr19A">
-                <outgoingTransitions xmi:id="_1DPkM6poEeaBVaJDWwr19A" specification="after 500 ms" target="_1DajEKpoEeaBVaJDWwr19A"/>
+                <outgoingTransitions xmi:id="_1DPkM6poEeaBVaJDWwr19A" specification="after 250 ms" target="_1DajEKpoEeaBVaJDWwr19A"/>
               </vertices>
             </regions>
           </vertices>
@@ -139,16 +139,16 @@
                 <outgoingTransitions xmi:id="_lFFNkKqpEeaKha2ZjZiJDw" specification="" target="_HuoQ8KqpEeaKha2ZjZiJDw"/>
               </vertices>
               <vertices xsi:type="sgraph:State" xmi:id="_HuoQ8KqpEeaKha2ZjZiJDw" specification="entry/Display.hideSelection()" name="hideSelection" incomingTransitions="_ipFFMKqpEeaKha2ZjZiJDw _lFFNkKqpEeaKha2ZjZiJDw">
-                <outgoingTransitions xmi:id="_T9WQkKqpEeaKha2ZjZiJDw" specification="after 500ms " target="_MyqykKqpEeaKha2ZjZiJDw"/>
+                <outgoingTransitions xmi:id="_T9WQkKqpEeaKha2ZjZiJDw" specification="after 250ms " target="_MyqykKqpEeaKha2ZjZiJDw"/>
               </vertices>
               <vertices xsi:type="sgraph:State" xmi:id="_MyqykKqpEeaKha2ZjZiJDw" specification="entry/Display.showSelection()" name="showSelection" incomingTransitions="_T9WQkKqpEeaKha2ZjZiJDw">
-                <outgoingTransitions xmi:id="_ipFFMKqpEeaKha2ZjZiJDw" specification="after 500ms" target="_HuoQ8KqpEeaKha2ZjZiJDw"/>
+                <outgoingTransitions xmi:id="_ipFFMKqpEeaKha2ZjZiJDw" specification="after 250ms" target="_HuoQ8KqpEeaKha2ZjZiJDw"/>
               </vertices>
             </regions>
             <regions xmi:id="_uzRp0KqsEeaKha2ZjZiJDw" name="idleConstroller">
               <vertices xsi:type="sgraph:State" xmi:id="_w_H2UKqsEeaKha2ZjZiJDw" name="idle" incomingTransitions="_2ahvEKqsEeaKha2ZjZiJDw _GvBfCaqyEeaKha2ZjZiJDw _AX72kKqxEeaKha2ZjZiJDw">
                 <outgoingTransitions xmi:id="_3rXE0KqsEeaKha2ZjZiJDw" specification="Buttons.bottomLeftPressed, Buttons.bottomRightPressed, Buttons.topRightPressed" target="_y49FwKqsEeaKha2ZjZiJDw"/>
-                <outgoingTransitions xmi:id="_WWFFsKqtEeaKha2ZjZiJDw" specification="after 25s" target="_VWQncKqtEeaKha2ZjZiJDw"/>
+                <outgoingTransitions xmi:id="_WWFFsKqtEeaKha2ZjZiJDw" specification="after 5s" target="_VWQncKqtEeaKha2ZjZiJDw"/>
               </vertices>
               <vertices xsi:type="sgraph:Entry" xmi:id="_1rmzkKqsEeaKha2ZjZiJDw">
                 <outgoingTransitions xmi:id="_2ahvEKqsEeaKha2ZjZiJDw" specification="" target="_w_H2UKqsEeaKha2ZjZiJDw"/>
@@ -187,7 +187,7 @@
             <outgoingTransitions xmi:id="_dsgicKs2Eeadz4W_BX04nw" specification="LogicUnit.startAlarm" target="_b0URwKs2Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_b0URwKs2Eeadz4W_BX04nw" name="ActivateAlarm" incomingTransitions="_dsgicKs2Eeadz4W_BX04nw">
-            <outgoingTransitions xmi:id="_eXL3IKs2Eeadz4W_BX04nw" specification="after 4s" target="_uNViYKs0Eeadz4W_BX04nw"/>
+            <outgoingTransitions xmi:id="_eXL3IKs2Eeadz4W_BX04nw" specification="after 4s, Buttons.bottomLeftPressed, Buttons.bottomRightPressed, Buttons.topLeftPressed, Buttons.topRightPressed" target="_uNViYKs0Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_1PPM8Ks2Eeadz4W_BX04nw" specification="entry/LogicUnit.setAlarm()&#xD;&#xA;entry/Display.refreshAlarmDisplay()&#xD;&#xA;&#xD;&#xA;" name="AlarmOff" incomingTransitions="_XOoVgKs1Eeadz4W_BX04nw">
             <outgoingTransitions xmi:id="_6Z0bcKs2Eeadz4W_BX04nw" specification="Buttons.bottomLeftPressed [active(digitalwatch.Ticker.Main.Update.TimeDisplay)]" target="_uNViYKs0Eeadz4W_BX04nw"/>
@@ -197,15 +197,15 @@
           <vertices xsi:type="sgraph:Entry" xmi:id="_WXp_UKs3Eeadz4W_BX04nw">
             <outgoingTransitions xmi:id="_X9rh8Ks3Eeadz4W_BX04nw" specification="" target="_XcuxAKs3Eeadz4W_BX04nw"/>
           </vertices>
-          <vertices xsi:type="sgraph:State" xmi:id="_XcuxAKs3Eeadz4W_BX04nw" name="idle" incomingTransitions="_X9rh8Ks3Eeadz4W_BX04nw _jWJPAKs3Eeadz4W_BX04nw">
+          <vertices xsi:type="sgraph:State" xmi:id="_XcuxAKs3Eeadz4W_BX04nw" specification="entry/Display.unsetIndiglo()" name="idle" incomingTransitions="_X9rh8Ks3Eeadz4W_BX04nw _jWJPAKs3Eeadz4W_BX04nw">
             <outgoingTransitions xmi:id="_ZY_CUKs3Eeadz4W_BX04nw" specification="[active(digitalwatch.Alarm.ActivateAlarm)]" target="_Y3HrYKs3Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_Y3HrYKs3Eeadz4W_BX04nw" specification="entry/ Display.setIndiglo()&#xD;&#xA;" name="AlarmFlashOn" incomingTransitions="_ZY_CUKs3Eeadz4W_BX04nw _cgJLEKs4Eeadz4W_BX04nw">
-            <outgoingTransitions xmi:id="_iPVX8Ks3Eeadz4W_BX04nw" specification="after 500 ms" target="_YFrx8Ks4Eeadz4W_BX04nw"/>
+            <outgoingTransitions xmi:id="_iPVX8Ks3Eeadz4W_BX04nw" specification="after 250 ms" target="_YFrx8Ks4Eeadz4W_BX04nw"/>
             <outgoingTransitions xmi:id="_jWJPAKs3Eeadz4W_BX04nw" specification="[!active(digitalwatch.Alarm.ActivateAlarm)]" target="_XcuxAKs3Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_YFrx8Ks4Eeadz4W_BX04nw" specification="entry/ Display.unsetIndiglo()" name="AlarmFlashOff" incomingTransitions="_iPVX8Ks3Eeadz4W_BX04nw">
-            <outgoingTransitions xmi:id="_cgJLEKs4Eeadz4W_BX04nw" specification="after 500 ms" target="_Y3HrYKs3Eeadz4W_BX04nw"/>
+            <outgoingTransitions xmi:id="_cgJLEKs4Eeadz4W_BX04nw" specification="after 250 ms" target="_Y3HrYKs3Eeadz4W_BX04nw"/>
           </vertices>
         </regions>
       </vertices>
@@ -1942,7 +1942,7 @@
     <edges xmi:id="_jWKdIKs3Eeadz4W_BX04nw" type="Transition" element="_jWJPAKs3Eeadz4W_BX04nw" source="_Y3HrY6s3Eeadz4W_BX04nw" target="_XcuxA6s3Eeadz4W_BX04nw">
       <children xsi:type="notation:DecorationNode" xmi:id="_jWKdJKs3Eeadz4W_BX04nw" type="TransitionExpression">
         <styles xsi:type="notation:ShapeStyle" xmi:id="_jWKdJas3Eeadz4W_BX04nw"/>
-        <layoutConstraint xsi:type="notation:Location" xmi:id="_jWKdJqs3Eeadz4W_BX04nw" x="-78" y="218"/>
+        <layoutConstraint xsi:type="notation:Location" xmi:id="_jWKdJqs3Eeadz4W_BX04nw" x="-43" y="137"/>
       </children>
       <styles xsi:type="notation:ConnectorStyle" xmi:id="_jWKdIas3Eeadz4W_BX04nw" lineColor="4210752"/>
       <styles xsi:type="notation:FontStyle" xmi:id="_jWKdI6s3Eeadz4W_BX04nw" fontName="Verdana"/>

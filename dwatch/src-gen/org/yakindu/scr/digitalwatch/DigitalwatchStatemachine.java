@@ -541,7 +541,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_Alarm_ActivateAlarm_tr0_tr0() {
-		return timeEvents[17];
+		return timeEvents[17] || sCIButtons.bottomLeftPressed || sCIButtons.bottomRightPressed || sCIButtons.topLeftPressed || sCIButtons.topRightPressed;
 	}
 	
 	private boolean check_main_region_digitalwatch_Alarm_AlarmOff_tr0_tr0() {
@@ -821,8 +821,6 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	private void effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr1() {
 		exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
-		sCIDisplay.raiseUnsetIndiglo();
-		
 		enterSequence_main_region_digitalwatch_AlarmFlasher_idle_default();
 	}
 	
@@ -906,14 +904,14 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'hideSelection'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
-		timer.setTimer(this, 8, 500, false);
+		timer.setTimer(this, 8, 250, false);
 		
 		sCIDisplay.operationCallback.showSelection();
 	}
 	
 	/* Entry action for state 'showSelection'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_showSelection() {
-		timer.setTimer(this, 9, 500, false);
+		timer.setTimer(this, 9, 250, false);
 		
 		sCIDisplay.operationCallback.showSelection();
 	}
@@ -943,21 +941,21 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'hideSelection'. */
 	private void entryAction_main_region_digitalwatch_Ticker_AlarmEditing_blinker_hideSelection() {
-		timer.setTimer(this, 12, 500, false);
+		timer.setTimer(this, 12, 250, false);
 		
 		sCIDisplay.operationCallback.hideSelection();
 	}
 	
 	/* Entry action for state 'showSelection'. */
 	private void entryAction_main_region_digitalwatch_Ticker_AlarmEditing_blinker_showSelection() {
-		timer.setTimer(this, 13, 500, false);
+		timer.setTimer(this, 13, 250, false);
 		
 		sCIDisplay.operationCallback.showSelection();
 	}
 	
 	/* Entry action for state 'idle'. */
 	private void entryAction_main_region_digitalwatch_Ticker_AlarmEditing_idleConstroller_idle() {
-		timer.setTimer(this, 14, 25*1000, false);
+		timer.setTimer(this, 14, 5*1000, false);
 	}
 	
 	/* Entry action for state 'idleReset'. */
@@ -994,16 +992,21 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		sCIDisplay.operationCallback.refreshAlarmDisplay();
 	}
 	
+	/* Entry action for state 'idle'. */
+	private void entryAction_main_region_digitalwatch_AlarmFlasher_idle() {
+		sCIDisplay.operationCallback.unsetIndiglo();
+	}
+	
 	/* Entry action for state 'AlarmFlashOn'. */
 	private void entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn() {
-		timer.setTimer(this, 18, 500, false);
+		timer.setTimer(this, 18, 250, false);
 		
 		sCIDisplay.operationCallback.setIndiglo();
 	}
 	
 	/* Entry action for state 'AlarmFlashOff'. */
 	private void entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff() {
-		timer.setTimer(this, 19, 500, false);
+		timer.setTimer(this, 19, 250, false);
 		
 		sCIDisplay.operationCallback.unsetIndiglo();
 	}
@@ -1348,6 +1351,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* 'default' enter sequence for state idle */
 	private void enterSequence_main_region_digitalwatch_AlarmFlasher_idle_default() {
+		entryAction_main_region_digitalwatch_AlarmFlasher_idle();
 		nextStateIndex = 7;
 		stateVector[7] = State.main_region_digitalwatch_AlarmFlasher_idle;
 	}
