@@ -114,16 +114,9 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			chronoUpdate = true;
 		}
 		
-		private boolean generalAction;
-		
-		public void raiseGeneralAction() {
-			generalAction = true;
-		}
-		
 		protected void clearEvents() {
 			update = false;
 			chronoUpdate = false;
-			generalAction = false;
 		}
 	}
 	
@@ -162,18 +155,23 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		main_region_digitalwatch_Light_LightOff,
 		main_region_digitalwatch_Light_LightOn,
 		main_region_digitalwatch_Light_Wait,
-		main_region_digitalwatch_Alarm_AlarmOff,
+		main_region_digitalwatch_Alarm_idle,
 		main_region_digitalwatch_Alarm_AlarmOn,
+		main_region_digitalwatch_Alarm_ActivateAlarm,
+		main_region_digitalwatch_Alarm_AlarmOff,
+		main_region_digitalwatch_AlarmFlasher_idle,
+		main_region_digitalwatch_AlarmFlasher_AlarmFlashOn,
+		main_region_digitalwatch_AlarmFlasher_AlarmFlashOff,
 		$NullState$
 	};
 	
-	private final State[] stateVector = new State[7];
+	private final State[] stateVector = new State[8];
 	
 	private int nextStateIndex;
 	
 	private ITimer timer;
 	
-	private final boolean[] timeEvents = new boolean[17];
+	private final boolean[] timeEvents = new boolean[20];
 	public DigitalwatchStatemachine() {
 		sCIButtons = new SCIButtonsImpl();
 		sCIDisplay = new SCIDisplayImpl();
@@ -186,7 +184,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		if (timer == null) {
 			throw new IllegalStateException("timer not set.");
 		}
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < 8; i++) {
 			stateVector[i] = State.$NullState$;
 		}
 		clearEvents();
@@ -212,7 +210,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	 * @see IStatemachine#isActive()
 	 */
 	public boolean isActive() {
-		return stateVector[0] != State.$NullState$||stateVector[1] != State.$NullState$||stateVector[2] != State.$NullState$||stateVector[3] != State.$NullState$||stateVector[4] != State.$NullState$||stateVector[5] != State.$NullState$||stateVector[6] != State.$NullState$;
+		return stateVector[0] != State.$NullState$||stateVector[1] != State.$NullState$||stateVector[2] != State.$NullState$||stateVector[3] != State.$NullState$||stateVector[4] != State.$NullState$||stateVector[5] != State.$NullState$||stateVector[6] != State.$NullState$||stateVector[7] != State.$NullState$;
 	}
 	
 	/** 
@@ -249,7 +247,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		switch (state) {
 		case main_region_digitalwatch:
 			return stateVector[0].ordinal() >= State.
-					main_region_digitalwatch.ordinal()&& stateVector[0].ordinal() <= State.main_region_digitalwatch_Alarm_AlarmOn.ordinal();
+					main_region_digitalwatch.ordinal()&& stateVector[0].ordinal() <= State.main_region_digitalwatch_AlarmFlasher_AlarmFlashOff.ordinal();
 		case main_region_digitalwatch_ChronoTicker_Tick:
 			return stateVector[0] == State.main_region_digitalwatch_ChronoTicker_Tick;
 		case main_region_digitalwatch_ChronoTicker_Stopped:
@@ -311,10 +309,20 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			return stateVector[5] == State.main_region_digitalwatch_Light_LightOn;
 		case main_region_digitalwatch_Light_Wait:
 			return stateVector[5] == State.main_region_digitalwatch_Light_Wait;
-		case main_region_digitalwatch_Alarm_AlarmOff:
-			return stateVector[6] == State.main_region_digitalwatch_Alarm_AlarmOff;
+		case main_region_digitalwatch_Alarm_idle:
+			return stateVector[6] == State.main_region_digitalwatch_Alarm_idle;
 		case main_region_digitalwatch_Alarm_AlarmOn:
 			return stateVector[6] == State.main_region_digitalwatch_Alarm_AlarmOn;
+		case main_region_digitalwatch_Alarm_ActivateAlarm:
+			return stateVector[6] == State.main_region_digitalwatch_Alarm_ActivateAlarm;
+		case main_region_digitalwatch_Alarm_AlarmOff:
+			return stateVector[6] == State.main_region_digitalwatch_Alarm_AlarmOff;
+		case main_region_digitalwatch_AlarmFlasher_idle:
+			return stateVector[7] == State.main_region_digitalwatch_AlarmFlasher_idle;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOn:
+			return stateVector[7] == State.main_region_digitalwatch_AlarmFlasher_AlarmFlashOn;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOff:
+			return stateVector[7] == State.main_region_digitalwatch_AlarmFlasher_AlarmFlashOff;
 		default:
 			return false;
 		}
@@ -520,12 +528,40 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		return timeEvents[16];
 	}
 	
-	private boolean check_main_region_digitalwatch_Alarm_AlarmOff_tr0_tr0() {
-		return (sCIButtons.bottomLeftReleased) && ( !isStateActive(State.main_region_digitalwatch_Ticker_AlarmEditing));
+	private boolean check_main_region_digitalwatch_Alarm_idle_tr0_tr0() {
+		return (sCIButtons.bottomLeftPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay));
 	}
 	
 	private boolean check_main_region_digitalwatch_Alarm_AlarmOn_tr0_tr0() {
-		return (sCIButtons.bottomLeftReleased) && ( !isStateActive(State.main_region_digitalwatch_Ticker_AlarmEditing));
+		return (sCIButtons.bottomLeftPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay));
+	}
+	
+	private boolean check_main_region_digitalwatch_Alarm_AlarmOn_tr1_tr1() {
+		return sCILogicUnit.startAlarm;
+	}
+	
+	private boolean check_main_region_digitalwatch_Alarm_ActivateAlarm_tr0_tr0() {
+		return timeEvents[17];
+	}
+	
+	private boolean check_main_region_digitalwatch_Alarm_AlarmOff_tr0_tr0() {
+		return (sCIButtons.bottomLeftPressed) && (isStateActive(State.main_region_digitalwatch_Ticker_Main_Update_TimeDisplay));
+	}
+	
+	private boolean check_main_region_digitalwatch_AlarmFlasher_idle_tr0_tr0() {
+		return isStateActive(State.main_region_digitalwatch_Alarm_ActivateAlarm);
+	}
+	
+	private boolean check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr0_tr0() {
+		return timeEvents[18];
+	}
+	
+	private boolean check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr1_tr1() {
+		return !isStateActive(State.main_region_digitalwatch_Alarm_ActivateAlarm);
+	}
+	
+	private boolean check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_tr0_tr0() {
+		return timeEvents[19];
 	}
 	
 	private void effect_main_region_digitalwatch_ChronoTicker_Tick_tr0() {
@@ -748,14 +784,51 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		enterSequence_main_region_digitalwatch_Light_LightOff_default();
 	}
 	
-	private void effect_main_region_digitalwatch_Alarm_AlarmOff_tr0() {
-		exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+	private void effect_main_region_digitalwatch_Alarm_idle_tr0() {
+		exitSequence_main_region_digitalwatch_Alarm_idle();
 		enterSequence_main_region_digitalwatch_Alarm_AlarmOn_default();
 	}
 	
 	private void effect_main_region_digitalwatch_Alarm_AlarmOn_tr0() {
 		exitSequence_main_region_digitalwatch_Alarm_AlarmOn();
 		enterSequence_main_region_digitalwatch_Alarm_AlarmOff_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Alarm_AlarmOn_tr1() {
+		exitSequence_main_region_digitalwatch_Alarm_AlarmOn();
+		enterSequence_main_region_digitalwatch_Alarm_ActivateAlarm_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Alarm_ActivateAlarm_tr0() {
+		exitSequence_main_region_digitalwatch_Alarm_ActivateAlarm();
+		enterSequence_main_region_digitalwatch_Alarm_AlarmOn_default();
+	}
+	
+	private void effect_main_region_digitalwatch_Alarm_AlarmOff_tr0() {
+		exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+		enterSequence_main_region_digitalwatch_Alarm_AlarmOn_default();
+	}
+	
+	private void effect_main_region_digitalwatch_AlarmFlasher_idle_tr0() {
+		exitSequence_main_region_digitalwatch_AlarmFlasher_idle();
+		enterSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_default();
+	}
+	
+	private void effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr0() {
+		exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+		enterSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_default();
+	}
+	
+	private void effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr1() {
+		exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+		sCIDisplay.raiseUnsetIndiglo();
+		
+		enterSequence_main_region_digitalwatch_AlarmFlasher_idle_default();
+	}
+	
+	private void effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_tr0() {
+		exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
+		enterSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_default();
 	}
 	
 	/* Entry action for state 'Tick'. */
@@ -767,7 +840,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'toTimeEdit'. */
 	private void entryAction_main_region_digitalwatch_Ticker_Main_Main_toTimeEdit() {
-		timer.setTimer(this, 1, 1/1000, false);
+		timer.setTimer(this, 1, 1500, false);
 	}
 	
 	/* Entry action for state 'toAlarmEdit'. */
@@ -835,7 +908,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
 		timer.setTimer(this, 8, 500, false);
 		
-		sCIDisplay.operationCallback.hideSelection();
+		sCIDisplay.operationCallback.showSelection();
 	}
 	
 	/* Entry action for state 'showSelection'. */
@@ -884,7 +957,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Entry action for state 'idle'. */
 	private void entryAction_main_region_digitalwatch_Ticker_AlarmEditing_idleConstroller_idle() {
-		timer.setTimer(this, 14, 5*1000, false);
+		timer.setTimer(this, 14, 25*1000, false);
 	}
 	
 	/* Entry action for state 'idleReset'. */
@@ -902,14 +975,37 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		timer.setTimer(this, 16, 2*1000, false);
 	}
 	
-	/* Entry action for state 'AlarmOff'. */
-	private void entryAction_main_region_digitalwatch_Alarm_AlarmOff() {
-		sCILogicUnit.operationCallback.setAlarm();
-	}
-	
 	/* Entry action for state 'AlarmOn'. */
 	private void entryAction_main_region_digitalwatch_Alarm_AlarmOn() {
 		sCILogicUnit.operationCallback.setAlarm();
+		
+		sCIDisplay.operationCallback.refreshAlarmDisplay();
+	}
+	
+	/* Entry action for state 'ActivateAlarm'. */
+	private void entryAction_main_region_digitalwatch_Alarm_ActivateAlarm() {
+		timer.setTimer(this, 17, 4*1000, false);
+	}
+	
+	/* Entry action for state 'AlarmOff'. */
+	private void entryAction_main_region_digitalwatch_Alarm_AlarmOff() {
+		sCILogicUnit.operationCallback.setAlarm();
+		
+		sCIDisplay.operationCallback.refreshAlarmDisplay();
+	}
+	
+	/* Entry action for state 'AlarmFlashOn'. */
+	private void entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn() {
+		timer.setTimer(this, 18, 500, false);
+		
+		sCIDisplay.operationCallback.setIndiglo();
+	}
+	
+	/* Entry action for state 'AlarmFlashOff'. */
+	private void entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff() {
+		timer.setTimer(this, 19, 500, false);
+		
+		sCIDisplay.operationCallback.unsetIndiglo();
 	}
 	
 	/* Exit action for state 'Tick'. */
@@ -999,12 +1095,28 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		sCIDisplay.operationCallback.unsetIndiglo();
 	}
 	
+	/* Exit action for state 'ActivateAlarm'. */
+	private void exitAction_main_region_digitalwatch_Alarm_ActivateAlarm() {
+		timer.unsetTimer(this, 17);
+	}
+	
+	/* Exit action for state 'AlarmFlashOn'. */
+	private void exitAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn() {
+		timer.unsetTimer(this, 18);
+	}
+	
+	/* Exit action for state 'AlarmFlashOff'. */
+	private void exitAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff() {
+		timer.unsetTimer(this, 19);
+	}
+	
 	/* 'default' enter sequence for state digitalwatch */
 	private void enterSequence_main_region_digitalwatch_default() {
 		enterSequence_main_region_digitalwatch_ChronoTicker_default();
 		enterSequence_main_region_digitalwatch_Ticker_default();
 		enterSequence_main_region_digitalwatch_Light_default();
 		enterSequence_main_region_digitalwatch_Alarm_default();
+		enterSequence_main_region_digitalwatch_AlarmFlasher_default();
 	}
 	
 	/* 'default' enter sequence for state Tick */
@@ -1207,11 +1319,10 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		stateVector[5] = State.main_region_digitalwatch_Light_Wait;
 	}
 	
-	/* 'default' enter sequence for state AlarmOff */
-	private void enterSequence_main_region_digitalwatch_Alarm_AlarmOff_default() {
-		entryAction_main_region_digitalwatch_Alarm_AlarmOff();
+	/* 'default' enter sequence for state idle */
+	private void enterSequence_main_region_digitalwatch_Alarm_idle_default() {
 		nextStateIndex = 6;
-		stateVector[6] = State.main_region_digitalwatch_Alarm_AlarmOff;
+		stateVector[6] = State.main_region_digitalwatch_Alarm_idle;
 	}
 	
 	/* 'default' enter sequence for state AlarmOn */
@@ -1219,6 +1330,40 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		entryAction_main_region_digitalwatch_Alarm_AlarmOn();
 		nextStateIndex = 6;
 		stateVector[6] = State.main_region_digitalwatch_Alarm_AlarmOn;
+	}
+	
+	/* 'default' enter sequence for state ActivateAlarm */
+	private void enterSequence_main_region_digitalwatch_Alarm_ActivateAlarm_default() {
+		entryAction_main_region_digitalwatch_Alarm_ActivateAlarm();
+		nextStateIndex = 6;
+		stateVector[6] = State.main_region_digitalwatch_Alarm_ActivateAlarm;
+	}
+	
+	/* 'default' enter sequence for state AlarmOff */
+	private void enterSequence_main_region_digitalwatch_Alarm_AlarmOff_default() {
+		entryAction_main_region_digitalwatch_Alarm_AlarmOff();
+		nextStateIndex = 6;
+		stateVector[6] = State.main_region_digitalwatch_Alarm_AlarmOff;
+	}
+	
+	/* 'default' enter sequence for state idle */
+	private void enterSequence_main_region_digitalwatch_AlarmFlasher_idle_default() {
+		nextStateIndex = 7;
+		stateVector[7] = State.main_region_digitalwatch_AlarmFlasher_idle;
+	}
+	
+	/* 'default' enter sequence for state AlarmFlashOn */
+	private void enterSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_default() {
+		entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+		nextStateIndex = 7;
+		stateVector[7] = State.main_region_digitalwatch_AlarmFlasher_AlarmFlashOn;
+	}
+	
+	/* 'default' enter sequence for state AlarmFlashOff */
+	private void enterSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_default() {
+		entryAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
+		nextStateIndex = 7;
+		stateVector[7] = State.main_region_digitalwatch_AlarmFlasher_AlarmFlashOff;
 	}
 	
 	/* 'default' enter sequence for region main region */
@@ -1294,6 +1439,11 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	/* 'default' enter sequence for region Alarm */
 	private void enterSequence_main_region_digitalwatch_Alarm_default() {
 		react_main_region_digitalwatch_Alarm__entry_Default();
+	}
+	
+	/* 'default' enter sequence for region AlarmFlasher */
+	private void enterSequence_main_region_digitalwatch_AlarmFlasher_default() {
+		react_main_region_digitalwatch_AlarmFlasher__entry_Default();
 	}
 	
 	/* Default exit sequence for state Tick */
@@ -1508,8 +1658,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		exitAction_main_region_digitalwatch_Light_Wait();
 	}
 	
-	/* Default exit sequence for state AlarmOff */
-	private void exitSequence_main_region_digitalwatch_Alarm_AlarmOff() {
+	/* Default exit sequence for state idle */
+	private void exitSequence_main_region_digitalwatch_Alarm_idle() {
 		nextStateIndex = 6;
 		stateVector[6] = State.$NullState$;
 	}
@@ -1518,6 +1668,42 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	private void exitSequence_main_region_digitalwatch_Alarm_AlarmOn() {
 		nextStateIndex = 6;
 		stateVector[6] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state ActivateAlarm */
+	private void exitSequence_main_region_digitalwatch_Alarm_ActivateAlarm() {
+		nextStateIndex = 6;
+		stateVector[6] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_Alarm_ActivateAlarm();
+	}
+	
+	/* Default exit sequence for state AlarmOff */
+	private void exitSequence_main_region_digitalwatch_Alarm_AlarmOff() {
+		nextStateIndex = 6;
+		stateVector[6] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state idle */
+	private void exitSequence_main_region_digitalwatch_AlarmFlasher_idle() {
+		nextStateIndex = 7;
+		stateVector[7] = State.$NullState$;
+	}
+	
+	/* Default exit sequence for state AlarmFlashOn */
+	private void exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn() {
+		nextStateIndex = 7;
+		stateVector[7] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+	}
+	
+	/* Default exit sequence for state AlarmFlashOff */
+	private void exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff() {
+		nextStateIndex = 7;
+		stateVector[7] = State.$NullState$;
+		
+		exitAction_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
 	}
 	
 	/* Default exit sequence for region main region */
@@ -1631,11 +1817,31 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 		
 		switch (stateVector[6]) {
-		case main_region_digitalwatch_Alarm_AlarmOff:
-			exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+		case main_region_digitalwatch_Alarm_idle:
+			exitSequence_main_region_digitalwatch_Alarm_idle();
 			break;
 		case main_region_digitalwatch_Alarm_AlarmOn:
 			exitSequence_main_region_digitalwatch_Alarm_AlarmOn();
+			break;
+		case main_region_digitalwatch_Alarm_ActivateAlarm:
+			exitSequence_main_region_digitalwatch_Alarm_ActivateAlarm();
+			break;
+		case main_region_digitalwatch_Alarm_AlarmOff:
+			exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+			break;
+		default:
+			break;
+		}
+		
+		switch (stateVector[7]) {
+		case main_region_digitalwatch_AlarmFlasher_idle:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_idle();
+			break;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOn:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+			break;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOff:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
 			break;
 		default:
 			break;
@@ -1905,11 +2111,34 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	/* Default exit sequence for region Alarm */
 	private void exitSequence_main_region_digitalwatch_Alarm() {
 		switch (stateVector[6]) {
-		case main_region_digitalwatch_Alarm_AlarmOff:
-			exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+		case main_region_digitalwatch_Alarm_idle:
+			exitSequence_main_region_digitalwatch_Alarm_idle();
 			break;
 		case main_region_digitalwatch_Alarm_AlarmOn:
 			exitSequence_main_region_digitalwatch_Alarm_AlarmOn();
+			break;
+		case main_region_digitalwatch_Alarm_ActivateAlarm:
+			exitSequence_main_region_digitalwatch_Alarm_ActivateAlarm();
+			break;
+		case main_region_digitalwatch_Alarm_AlarmOff:
+			exitSequence_main_region_digitalwatch_Alarm_AlarmOff();
+			break;
+		default:
+			break;
+		}
+	}
+	
+	/* Default exit sequence for region AlarmFlasher */
+	private void exitSequence_main_region_digitalwatch_AlarmFlasher() {
+		switch (stateVector[7]) {
+		case main_region_digitalwatch_AlarmFlasher_idle:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_idle();
+			break;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOn:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+			break;
+		case main_region_digitalwatch_AlarmFlasher_AlarmFlashOff:
+			exitSequence_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
 			break;
 		default:
 			break;
@@ -2154,10 +2383,10 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		}
 	}
 	
-	/* The reactions of state AlarmOff. */
-	private void react_main_region_digitalwatch_Alarm_AlarmOff() {
-		if (check_main_region_digitalwatch_Alarm_AlarmOff_tr0_tr0()) {
-			effect_main_region_digitalwatch_Alarm_AlarmOff_tr0();
+	/* The reactions of state idle. */
+	private void react_main_region_digitalwatch_Alarm_idle() {
+		if (check_main_region_digitalwatch_Alarm_idle_tr0_tr0()) {
+			effect_main_region_digitalwatch_Alarm_idle_tr0();
 		}
 	}
 	
@@ -2165,6 +2394,49 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	private void react_main_region_digitalwatch_Alarm_AlarmOn() {
 		if (check_main_region_digitalwatch_Alarm_AlarmOn_tr0_tr0()) {
 			effect_main_region_digitalwatch_Alarm_AlarmOn_tr0();
+		} else {
+			if (check_main_region_digitalwatch_Alarm_AlarmOn_tr1_tr1()) {
+				effect_main_region_digitalwatch_Alarm_AlarmOn_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state ActivateAlarm. */
+	private void react_main_region_digitalwatch_Alarm_ActivateAlarm() {
+		if (check_main_region_digitalwatch_Alarm_ActivateAlarm_tr0_tr0()) {
+			effect_main_region_digitalwatch_Alarm_ActivateAlarm_tr0();
+		}
+	}
+	
+	/* The reactions of state AlarmOff. */
+	private void react_main_region_digitalwatch_Alarm_AlarmOff() {
+		if (check_main_region_digitalwatch_Alarm_AlarmOff_tr0_tr0()) {
+			effect_main_region_digitalwatch_Alarm_AlarmOff_tr0();
+		}
+	}
+	
+	/* The reactions of state idle. */
+	private void react_main_region_digitalwatch_AlarmFlasher_idle() {
+		if (check_main_region_digitalwatch_AlarmFlasher_idle_tr0_tr0()) {
+			effect_main_region_digitalwatch_AlarmFlasher_idle_tr0();
+		}
+	}
+	
+	/* The reactions of state AlarmFlashOn. */
+	private void react_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn() {
+		if (check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr0_tr0()) {
+			effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr0();
+		} else {
+			if (check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr1_tr1()) {
+				effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr1();
+			}
+		}
+	}
+	
+	/* The reactions of state AlarmFlashOff. */
+	private void react_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff() {
+		if (check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_tr0_tr0()) {
+			effect_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff_tr0();
 		}
 	}
 	
@@ -2240,7 +2512,12 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	
 	/* Default react sequence for initial entry  */
 	private void react_main_region_digitalwatch_Alarm__entry_Default() {
-		enterSequence_main_region_digitalwatch_Alarm_AlarmOff_default();
+		enterSequence_main_region_digitalwatch_Alarm_idle_default();
+	}
+	
+	/* Default react sequence for initial entry  */
+	private void react_main_region_digitalwatch_AlarmFlasher__entry_Default() {
+		enterSequence_main_region_digitalwatch_AlarmFlasher_idle_default();
 	}
 	
 	/* The reactions of exit default. */
@@ -2348,11 +2625,26 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 			case main_region_digitalwatch_Light_Wait:
 				react_main_region_digitalwatch_Light_Wait();
 				break;
-			case main_region_digitalwatch_Alarm_AlarmOff:
-				react_main_region_digitalwatch_Alarm_AlarmOff();
+			case main_region_digitalwatch_Alarm_idle:
+				react_main_region_digitalwatch_Alarm_idle();
 				break;
 			case main_region_digitalwatch_Alarm_AlarmOn:
 				react_main_region_digitalwatch_Alarm_AlarmOn();
+				break;
+			case main_region_digitalwatch_Alarm_ActivateAlarm:
+				react_main_region_digitalwatch_Alarm_ActivateAlarm();
+				break;
+			case main_region_digitalwatch_Alarm_AlarmOff:
+				react_main_region_digitalwatch_Alarm_AlarmOff();
+				break;
+			case main_region_digitalwatch_AlarmFlasher_idle:
+				react_main_region_digitalwatch_AlarmFlasher_idle();
+				break;
+			case main_region_digitalwatch_AlarmFlasher_AlarmFlashOn:
+				react_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn();
+				break;
+			case main_region_digitalwatch_AlarmFlasher_AlarmFlashOff:
+				react_main_region_digitalwatch_AlarmFlasher_AlarmFlashOff();
 				break;
 			default:
 				// $NullState$
