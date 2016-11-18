@@ -88,7 +88,7 @@
                     <outgoingTransitions xmi:id="_T9WQkKqpEeaKha2ZjZiJDw" specification="after 250ms " target="_MyqykKqpEeaKha2ZjZiJDw"/>
                   </vertices>
                   <vertices xsi:type="sgraph:State" xmi:id="_MyqykKqpEeaKha2ZjZiJDw" specification="entry/Display.showSelection()" name="showSelection" incomingTransitions="_T9WQkKqpEeaKha2ZjZiJDw">
-                    <outgoingTransitions xmi:id="_ipFFMKqpEeaKha2ZjZiJDw" specification="after 250 ms [active(digitalwatch.Ticker.Main.Update.AlarmEditing.increase.idle)]  " target="_HuoQ8KqpEeaKha2ZjZiJDw"/>
+                    <outgoingTransitions xmi:id="_ipFFMKqpEeaKha2ZjZiJDw" specification="after 250 ms" target="_HuoQ8KqpEeaKha2ZjZiJDw"/>
                   </vertices>
                 </regions>
                 <regions xmi:id="_uzRp0KqsEeaKha2ZjZiJDw" name="idleConstroller">
@@ -1677,7 +1677,7 @@
     <edges xmi:id="_ipFFMaqpEeaKha2ZjZiJDw" type="Transition" element="_ipFFMKqpEeaKha2ZjZiJDw" source="_EQt1662tEeal3ZmpwoXRMQ" target="_EQt1362tEeal3ZmpwoXRMQ">
       <children xsi:type="notation:DecorationNode" xmi:id="_ipFFNaqpEeaKha2ZjZiJDw" type="TransitionExpression">
         <styles xsi:type="notation:ShapeStyle" xmi:id="_ipFFNqqpEeaKha2ZjZiJDw"/>
-        <layoutConstraint xsi:type="notation:Location" xmi:id="_ipFFN6qpEeaKha2ZjZiJDw" x="30" y="57"/>
+        <layoutConstraint xsi:type="notation:Location" xmi:id="_ipFFN6qpEeaKha2ZjZiJDw" y="10"/>
       </children>
       <styles xsi:type="notation:ConnectorStyle" xmi:id="_ipFFMqqpEeaKha2ZjZiJDw" lineColor="4210752"/>
       <styles xsi:type="notation:FontStyle" xmi:id="_ipFFNKqpEeaKha2ZjZiJDw" fontName="Verdana"/>
