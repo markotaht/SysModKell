@@ -906,7 +906,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	private void entryAction_main_region_digitalwatch_Ticker_Editing_blinker_hideSelection() {
 		timer.setTimer(this, 8, 250, false);
 		
-		sCIDisplay.operationCallback.showSelection();
+		sCIDisplay.operationCallback.hideSelection();
 	}
 	
 	/* Entry action for state 'showSelection'. */
