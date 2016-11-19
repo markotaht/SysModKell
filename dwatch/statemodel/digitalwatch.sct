@@ -195,7 +195,7 @@
             <outgoingTransitions xmi:id="_XOoVgKs1Eeadz4W_BX04nw" specification="Buttons.bottomLeftPressed [active(digitalwatch.Ticker.Main.Update.toAlarmEdit)]" target="_1PPM8Ks2Eeadz4W_BX04nw"/>
             <outgoingTransitions xmi:id="_dsgicKs2Eeadz4W_BX04nw" specification="LogicUnit.startAlarm" target="_b0URwKs2Eeadz4W_BX04nw"/>
           </vertices>
-          <vertices xsi:type="sgraph:State" xmi:id="_b0URwKs2Eeadz4W_BX04nw" specification="exit/ LogicUnit.setAlarm()" name="ActivateAlarm" incomingTransitions="_dsgicKs2Eeadz4W_BX04nw">
+          <vertices xsi:type="sgraph:State" xmi:id="_b0URwKs2Eeadz4W_BX04nw" specification="exit/ LogicUnit.setAlarm()&#xD;&#xA;exit/ Display.refreshAlarmDisplay()" name="ActivateAlarm" incomingTransitions="_dsgicKs2Eeadz4W_BX04nw">
             <outgoingTransitions xmi:id="_eXL3IKs2Eeadz4W_BX04nw" specification="after 4s, Buttons.bottomLeftPressed, Buttons.bottomRightPressed, Buttons.topLeftPressed, Buttons.topRightPressed" target="_uNViYKs0Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_1PPM8Ks2Eeadz4W_BX04nw" specification="entry/LogicUnit.setAlarm()&#xD;&#xA;entry/Display.refreshAlarmDisplay()&#xD;&#xA;&#xD;&#xA;" name="AlarmOff" incomingTransitions="_XOoVgKs1Eeadz4W_BX04nw">

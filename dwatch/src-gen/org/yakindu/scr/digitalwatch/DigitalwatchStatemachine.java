@@ -1163,6 +1163,8 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 		timer.unsetTimer(this, 18);
 		
 		sCILogicUnit.operationCallback.setAlarm();
+		
+		sCIDisplay.operationCallback.refreshAlarmDisplay();
 	}
 	
 	/* Exit action for state 'AlarmFlashOn'. */
