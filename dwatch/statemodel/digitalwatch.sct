@@ -207,7 +207,7 @@
             <outgoingTransitions xmi:id="_X9rh8Ks3Eeadz4W_BX04nw" specification="" target="_XcuxAKs3Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_XcuxAKs3Eeadz4W_BX04nw" specification="entry/Display.unsetIndiglo()" name="idle" incomingTransitions="_X9rh8Ks3Eeadz4W_BX04nw _jWJPAKs3Eeadz4W_BX04nw">
-            <outgoingTransitions xmi:id="_ZY_CUKs3Eeadz4W_BX04nw" specification="[active(digitalwatch.Alarm.ActivateAlarm)]" target="_Y3HrYKs3Eeadz4W_BX04nw"/>
+            <outgoingTransitions xmi:id="_ZY_CUKs3Eeadz4W_BX04nw" specification="LogicUnit.startAlarm" target="_Y3HrYKs3Eeadz4W_BX04nw"/>
           </vertices>
           <vertices xsi:type="sgraph:State" xmi:id="_Y3HrYKs3Eeadz4W_BX04nw" specification="entry/ Display.setIndiglo()&#xD;&#xA;" name="AlarmFlashOn" incomingTransitions="_ZY_CUKs3Eeadz4W_BX04nw _cgJLEKs4Eeadz4W_BX04nw">
             <outgoingTransitions xmi:id="_iPVX8Ks3Eeadz4W_BX04nw" specification="after 250 ms" target="_YFrx8Ks4Eeadz4W_BX04nw"/>

@@ -575,7 +575,7 @@ public class DigitalwatchStatemachine implements IDigitalwatchStatemachine {
 	}
 	
 	private boolean check_main_region_digitalwatch_AlarmFlasher_idle_tr0_tr0() {
-		return isStateActive(State.main_region_digitalwatch_Alarm_ActivateAlarm);
+		return sCILogicUnit.startAlarm;
 	}
 	
 	private boolean check_main_region_digitalwatch_AlarmFlasher_AlarmFlashOn_tr0_tr0() {
